@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "gulp",
-    "start": "yarn run build && node .",
-    "debug": "yarn run build && node --inspect=55555 ."
+    "start": "node .",
+    "debug": "yarn build && node --inspect=55555 ."
   },
   "dependencies": {
     "axios": "^0.16.2",

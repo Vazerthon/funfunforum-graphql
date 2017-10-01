@@ -6,17 +6,18 @@ import {
   GraphQLFloat,
   GraphQLBoolean,
 } from 'graphql';
-import { forumDataFetch } from '../services';
 
-const defaultUserLocation = {
-  lat: 0,
-  lng: 0,
-  caption: 'default',
-  default: true,
-};
+let getNextDefaultLocation;
 
-const defaultHackableJson = {
-  usermap_location: defaultUserLocation,
+const getNextDefaultHackableJson = error => {
+  const defaultHackable = {
+    usermap_location: {
+      ...getNextDefaultLocation(),
+    },
+    error,
+  };
+
+  return defaultHackable;
 };
 
 const UsermapLocationType = new GraphQLObjectType({
@@ -50,7 +51,18 @@ const HackableJsonType = new GraphQLObjectType({
   fields: () => ({
     usermapLocation: {
       type: UsermapLocationType,
-      resolve: user => user.usermap_location,
+      resolve: hackableJson => {
+        if (!hackableJson.usermap_location) {
+          return {
+            ...getNextDefaultLocation(),
+          };
+        }
+        return hackableJson.usermap_location;
+      },
+    },
+    error: {
+      type: GraphQLString,
+      resolve: hackableJson => hackableJson.error,
     },
   }),
 });
@@ -70,14 +82,16 @@ const UserType = new GraphQLObjectType({
         try {
           return JSON.parse(user.hackable_json);
         } catch (error) {
-          return defaultHackableJson;
+          return {
+            ...getNextDefaultHackableJson(error.message),
+          };
         }
       },
     },
     profilePicture: {
       type: GraphQLString,
       resolve: user =>
-        `https://cdn-standard6.discourse.org/user_avatar/www.funfunforum.com/${user.username}/90/149_1.png`,
+        `https://discourse-cdn-sjc1.com/standard6/user_avatar/www.funfunforum.com/${user.username}/160/840_1.png`,
     },
     profileUrl: {
       type: GraphQLString,
@@ -96,9 +110,11 @@ const funFunSchema = new GraphQLSchema({
     fields: () => ({
       users: {
         type: UsersType,
-        resolve: async () => {
+        resolve: async (obj, args, context) => {
+          getNextDefaultLocation = context.lostSoulFactory().getNextLostSoul;
+
           try {
-            const { data } = await forumDataFetch();
+            const { data } = await context.forumDataFetch();
             return data;
           } catch (error) {
             throw Error('Problem getting data from REST API');

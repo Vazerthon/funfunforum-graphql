@@ -1,10 +1,19 @@
 import hapi from 'hapi';
 import { graphqlHapi, graphiqlHapi } from 'graphql-server-hapi';
 import { funFunSchema } from './schema';
+import { forumDataFetch, lostSoulFactory } from './services';
 
 const webServer = ({ host, port, debug }) => {
   const server = new hapi.Server();
-  server.connection({ host, port });
+  server.connection({
+    host,
+    port,
+    routes: {
+      cors: {
+        origin: ['*'],
+      },
+    },
+  });
 
   if (debug) {
     server.register({
@@ -25,9 +34,10 @@ const webServer = ({ host, port, debug }) => {
         path: '/funfunforum',
         graphqlOptions: {
           schema: funFunSchema,
-        },
-        route: {
-          cors: true,
+          context: {
+            forumDataFetch,
+            lostSoulFactory,
+          },
         },
       },
     },
