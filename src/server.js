@@ -1,10 +1,11 @@
 import hapi from 'hapi';
 import { graphqlHapi, graphiqlHapi } from 'graphql-server-hapi';
 import { funFunSchema } from './schema';
-import { forumDataFetch, lostSoulFactory } from './services';
+import { lostSoulFactory, forumDataloader } from './services';
 
 const webServer = ({ host, port, debug }) => {
   const server = new hapi.Server();
+
   server.connection({
     host,
     port,
@@ -35,7 +36,7 @@ const webServer = ({ host, port, debug }) => {
         graphqlOptions: {
           schema: funFunSchema,
           context: {
-            forumDataFetch,
+            forumDataloader,
             lostSoulFactory,
           },
         },

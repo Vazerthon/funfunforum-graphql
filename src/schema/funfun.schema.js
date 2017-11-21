@@ -8,6 +8,7 @@ import {
 } from 'graphql';
 
 let getNextDefaultLocation;
+let dataCache;
 
 const getNextDefaultHackableJson = error => {
   const defaultHackable = {
@@ -114,9 +115,13 @@ const funFunSchema = new GraphQLSchema({
           getNextDefaultLocation = context.lostSoulFactory().getNextLostSoul;
 
           try {
-            const { data } = await context.forumDataFetch();
+            const { data } = await context.forumDataloader().load();
+            dataCache = data;
             return data;
-          } catch (error) {
+          } catch (e) {
+            if (dataCache) {
+              return dataCache;
+            }
             throw Error('Problem getting data from REST API');
           }
         },

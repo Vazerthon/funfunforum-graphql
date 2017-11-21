@@ -1,10 +1,11 @@
 import axios from 'axios';
+import Dataloader from 'dataloader';
 
-const forumDataFetch = async () => {
+export const forumDataFetch = async () => {
   const data = await axios.get(
     'https://ffforumautomator.herokuapp.com/hackable-data',
   );
   return data;
 };
 
-export default forumDataFetch;
+export const forumDataloader = new Dataloader(forumDataFetch);
