@@ -115,7 +115,7 @@ const funFunSchema = new GraphQLSchema({
           getNextDefaultLocation = context.lostSoulFactory().getNextLostSoul;
 
           try {
-            const { data } = await context.forumDataloader().load();
+            const { data } = await context.forumDataFetch();
             dataCache = data;
             return data;
           } catch (e) {
