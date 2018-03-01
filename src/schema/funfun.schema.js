@@ -80,7 +80,7 @@ const UserType = new GraphQLObjectType({
       type: HackableJsonType,
       resolve: user => {
         try {
-          return JSON.parse(user.hackable_json);
+          return JSON.parse(user.json);
         } catch (error) {
           return {
             ...getNextDefaultHackableJson(error.message),
@@ -107,7 +107,7 @@ const UsersType = new GraphQLList(UserType);
 const userDictionaryToArray = dict =>
   Object.keys(dict).map(username => ({
     username,
-    ...dict[username],
+    json: dict[username],
   }));
 
 const funFunSchema = new GraphQLSchema({
