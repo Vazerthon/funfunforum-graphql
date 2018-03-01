@@ -91,7 +91,9 @@ const UserType = new GraphQLObjectType({
     profilePicture: {
       type: GraphQLString,
       resolve: user =>
-        `https://discourse-cdn-sjc1.com/standard6/user_avatar/www.funfunforum.com/${user.username}/160/840_1.png`,
+        `https://discourse-cdn-sjc1.com/business5/user_avatar/www.funfunforum.com/${
+          user.username
+        }/160/840_1.png`,
     },
     profileUrl: {
       type: GraphQLString,
@@ -101,6 +103,12 @@ const UserType = new GraphQLObjectType({
 });
 
 const UsersType = new GraphQLList(UserType);
+
+const userDictionaryToArray = dict =>
+  Object.keys(dict).map(username => ({
+    username,
+    ...dict[username],
+  }));
 
 const funFunSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -115,7 +123,7 @@ const funFunSchema = new GraphQLSchema({
 
           try {
             const { data } = await context.forumDataFetch();
-            return data;
+            return userDictionaryToArray(data);
           } catch (error) {
             throw Error('Problem getting data from REST API');
           }
